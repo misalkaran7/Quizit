@@ -1,0 +1,168 @@
+@import "tailwindcss";
+
+/* ─── Design Tokens ─────────────────────────────────────────────── */
+:root {
+  --font-ui: "Space Grotesk", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", monospace;
+
+  /* Palette */
+  --bg-base:      #071418;
+  --bg-surface:   #0c1e24;
+  --bg-elevated:  #112830;
+  --border-dim:   #1e3540;
+  --border-mid:   #2a4555;
+
+  --amber:        #e06d25;
+  --amber-glow:   rgba(224, 109, 37, 0.18);
+  --amber-border: rgba(224, 109, 37, 0.30);
+  --amber-muted:  rgba(224, 109, 37, 0.10);
+
+  --ink-primary:  #f4f1de;
+  --ink-body:     #94a3b8;   /* slate-400 */
+  --ink-muted:    #4a6072;
+
+  --emerald:      #34d399;
+  --emerald-bg:   rgba(52, 211, 153, 0.08);
+  --emerald-border: rgba(52, 211, 153, 0.25);
+
+  --rose:         #fb7185;
+  --rose-bg:      rgba(251, 113, 133, 0.08);
+  --rose-border:  rgba(251, 113, 133, 0.25);
+
+  /* Z-index scale */
+  --z-dropdown: 100;
+  --z-sticky:   200;
+  --z-modal:    300;
+  --z-toast:    400;
+
+  /* Motion */
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --dur-fast:    150ms;
+  --dur-base:    220ms;
+  --dur-slow:    400ms;
+}
+
+/* ─── Global Reset ───────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  background-color: var(--bg-base);
+  color: var(--ink-body);
+  font-family: var(--font-ui);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+#root {
+  min-height: 100vh;
+  max-width: none;
+  padding: 0;
+  margin: 0;
+  text-align: left;
+}
+
+/* ─── Blueprint Grid Overlay ─────────────────────────────────────── */
+.grid-bg {
+  background-image:
+    radial-gradient(circle, var(--border-dim) 1px, transparent 1px);
+  background-size: 28px 28px;
+  background-position: center center;
+}
+
+/* Horizontal scan line accent — very subtle */
+.grid-bg::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(7, 20, 24, 0.12) 50%,
+    transparent 100%
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ─── Scrollbar ──────────────────────────────────────────────────── */
+::-webkit-scrollbar          { width: 4px; height: 4px; }
+::-webkit-scrollbar-track    { background: var(--bg-surface); }
+::-webkit-scrollbar-thumb    { background: var(--border-mid); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: var(--amber); }
+
+/* ─── Focus Ring ─────────────────────────────────────────────────── */
+:focus-visible {
+  outline: 1.5px solid var(--amber);
+  outline-offset: 2px;
+}
+
+/* ─── Keyframes ─────────────────────────────────────────────────── */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulse-amber {
+  0%, 100% { box-shadow: 0 0 0 0 var(--amber-glow); }
+  50%       { box-shadow: 0 0 0 6px transparent; }
+}
+
+@keyframes slide-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* ─── Utility animations ─────────────────────────────────────────── */
+.animate-spin-slow { animation: spin 1.2s linear infinite; }
+
+.animate-slide-up {
+  animation: slide-in-up var(--dur-slow) var(--ease-out-quart) both;
+}
+
+.animate-fade-in {
+  animation: fade-in var(--dur-base) var(--ease-out-quart) both;
+}
+
+/* Skeleton shimmer */
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--bg-elevated) 0%,
+    var(--border-mid) 50%,
+    var(--bg-elevated) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
+}
+
+/* ─── Reduced Motion ─────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
