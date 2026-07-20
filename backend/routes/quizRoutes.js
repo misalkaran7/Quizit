@@ -46,11 +46,14 @@ router.post('/generate-text', async (req, res) => {
 // @access  Public
 router.get('/', async (req, res) => {
   try {
+    if (!Quiz.collection.conn.readyState) {
+      return res.status(503).json({ error: 'Database not connected. Please ensure MONGO_URI is set.' });
+    }
     const quizzes = await Quiz.find().sort({ createdAt: -1 });
     return res.status(200).json(quizzes);
   } catch (error) {
     console.error('Fetch Quizzes Error:', error.message);
-    return res.status(500).json({ error: 'Failed to retrieve quizzes.' });
+    return res.status(500).json({ error: error.message || 'Failed to retrieve quizzes.' });
   }
 });
 
@@ -101,6 +104,10 @@ router.post('/generate-youtube', async (req, res) => {
 
     if (!videoUrl) {
       return res.status(400).json({ error: 'YouTube video URL is required.' });
+    }
+
+    if (!Quiz.collection.conn.readyState) {
+      return res.status(503).json({ error: 'Database not connected. Please ensure MONGO_URI is set in Vercel environment variables.' });
     }
 
     // Process transcript extraction asynchronously
