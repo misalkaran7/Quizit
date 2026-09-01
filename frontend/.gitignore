@@ -25,3 +25,7 @@ dist-ssr
 
 .env.*
 !.env.example
+.env
+.env.*
+backend/.env
+backend/.env.*
