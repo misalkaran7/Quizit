@@ -347,7 +347,15 @@ export default function App() {
       setPdfFile(null);
       if (fileInputRef.current) fileInputRef.current.value = '';
     } catch (error) {
-      alert(error.response?.data?.error || error.message || 'Generation failed.');
+      console.error('Generation full error:', error);
+      const resData = error.response?.data;
+      const errorMsg =
+        (typeof resData === 'string' ? resData : null) ||
+        resData?.message ||
+        resData?.error ||
+        error.message ||
+        'Generation failed.';
+      alert(errorMsg);
     } finally {
       setLoading(false);
     }
