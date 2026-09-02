@@ -1,11 +1,8 @@
-const path = require('path');
-require('dotenv').config({ path: path.join(__dirname, '../backend/.env') });
-
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 
-// Point to your backend route handlers
+// Import backend routes
 const quizRoutes = require('../backend/routes/quizRoutes');
 
 const app = express();
@@ -13,15 +10,23 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// MongoDB connection helper for Serverless
+// MongoDB connection caching for Serverless
 let isConnected = false;
 const connectDB = async () => {
-  if (isConnected) return;
+  if (isConnected || mongoose.connection.readyState >= 1) {
+    isConnected = true;
+    return;
+  }
+  if (!process.env.MONGO_URI) {
+    console.error('MONGO_URI is not defined in environment variables');
+    return;
+  }
   try {
     const conn = await mongoose.connect(process.env.MONGO_URI);
-    isConnected = conn.connections[0].readyState;
+    isConnected = conn.connections[0].readyState >= 1;
+    console.log('MongoDB connected successfully in serverless function');
   } catch (err) {
-    console.error('Mongo connection error:', err);
+    console.error('MongoDB connection error:', err);
   }
 };
 
@@ -30,11 +35,17 @@ app.use(async (req, res, next) => {
   next();
 });
 
-// Mount the quiz routes
+// Support both /quizzes and /api/quizzes to prevent 404 from rewrite path stripping
+app.use('/quizzes', quizRoutes);
 app.use('/api/quizzes', quizRoutes);
 
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', time: new Date() });
+app.get('/health', (req, res) => res.json({ status: 'ok' }));
+app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
+
+// Fallback 404 logger
+app.use((req, res) => {
+  console.log('Unhandled API route:', req.method, req.url);
+  res.status(404).json({ error: `Route not found on serverless API: ${req.method} ${req.url}` });
 });
 
 module.exports = app;
